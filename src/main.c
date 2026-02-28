@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <SDL2/SDL.h>
 #include <stdbool.h>
+#include <math.h>
 
 #include "error_handling.h"
 #include "constants.h"
@@ -21,6 +23,8 @@ typedef struct
 void Handle_Input(bool *);
 
 Player Init_Player(const Map *);
+
+float Cast_Ray(const Map *, float, float, float);
 
 // --- ENTRY POINT ------------>
 
@@ -102,4 +106,42 @@ Player Init_Player(const Map *map)
 	}
 
 	return p;
+}
+
+float Cast_Ray(const Map *map, float px, float py, float angle)
+{
+	float ray_dir_x = cosf(angle);
+	float ray_dir_y = sinf(angle);
+	float delta_dist_x = fabsf(1 / ray_dir_x);
+	float delta_dist_y = fabsf(1 / ray_dir_y);
+	int map_x = (int)px;
+	int map_y = (int)py;
+	int step_x = ray_dir_x > 0 ? 1 : -1;
+	int step_y = ray_dir_y > 0 ? 1 : -1;
+	float side_dist_x = step_x > 0 ? delta_dist_x * (ceil(px) - px) : delta_dist_x * (px - floor(px));
+	float side_dist_y = step_y > 0 ? delta_dist_y * (ceil(py) - py) : delta_dist_y * (py - floor(py));
+	bool hitx = false;
+
+	while (true)
+	{
+		if (side_dist_x < side_dist_y)
+		{
+			side_dist_x += delta_dist_x;
+			map_x += step_x;
+			hitx = true;
+		}
+		else
+		{
+			side_dist_y += delta_dist_y;
+			map_y += step_y;
+		}
+
+		if (map_x < 0 || map_x >= map->cols || map_y < 0 || map_y >= map->rows)
+			return INFINITY;
+
+		if (Map_Get(map, map_y, map_x) == TILE_WALL)
+			break;
+	}
+
+	return hitx ? side_dist_x - delta_dist_x : side_dist_y - delta_dist_y;
 }

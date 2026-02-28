@@ -4,6 +4,39 @@
 #include <time.h>
 #include "map.h"
 
+static void Carve(Map *map, int r, int c)
+{
+    int dirs[4][2] = {{0, 2}, {0, -2}, {2, 0}, {-2, 0}};
+
+    // shuffle dirs
+    for (int i = 3; i > 0; i--)
+    {
+        int j = rand() % (i + 1);
+        int tr = dirs[i][0], tc = dirs[i][1];
+        dirs[i][0] = dirs[j][0];
+        dirs[i][1] = dirs[j][1];
+        dirs[j][0] = tr;
+        dirs[j][1] = tc;
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+        int nr = r + dirs[i][0];
+        int nc = c + dirs[i][1];
+
+        if (nr <= 0 || nr >= map->rows - 1 || nc <= 0 || nc >= map->cols - 1)
+            continue;
+
+        if (Map_Get(map, nr, nc) == TILE_WALL)
+        {
+            // carve wall between
+            Map_Set(map, r + dirs[i][0] / 2, c + dirs[i][1] / 2, TILE_EMPTY);
+            Map_Set(map, nr, nc, TILE_EMPTY);
+            Carve(map, nr, nc);
+        }
+    }
+}
+
 Map *Map_CreateRandom(int rows, int cols)
 {
     Map *map = malloc(sizeof *map);
@@ -12,7 +45,6 @@ Map *Map_CreateRandom(int rows, int cols)
 
     map->rows = rows;
     map->cols = cols;
-
     map->data = malloc(rows * cols * sizeof *map->data);
     if (!map->data)
     {
@@ -22,9 +54,34 @@ Map *Map_CreateRandom(int rows, int cols)
 
     srand(time(NULL));
 
-    for (int r = 0; r < rows; r++)
-        for (int c = 0; c < cols; c++)
-            map->data[r * cols + c] = (TileType)(rand() % N_TILES);
+    // fill all walls
+    for (int i = 0; i < rows * cols; i++)
+        map->data[i] = TILE_WALL;
+
+    // start carving from (1,1)
+    Map_Set(map, 1, 1, TILE_EMPTY);
+    Carve(map, 1, 1);
+
+    return map;
+}
+
+Map *Map_CreateFromString(const char *layout, int rows, int cols)
+{
+    Map *map = malloc(sizeof *map);
+    if (!map)
+        return NULL;
+
+    map->rows = rows;
+    map->cols = cols;
+    map->data = malloc(rows * cols * sizeof *map->data);
+    if (!map->data)
+    {
+        free(map);
+        return NULL;
+    }
+
+    for (int i = 0; i < rows * cols; i++)
+        map->data[i] = (layout[i] == '#') ? TILE_WALL : TILE_EMPTY;
 
     return map;
 }

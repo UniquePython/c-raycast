@@ -18,6 +18,7 @@ typedef struct
 } Map;
 
 Map *Map_CreateRandom(int rows, int cols);
+Map *Map_CreateFromString(const char *layout, int rows, int cols);
 void Map_Destroy(Map *map);
 
 TileType Map_Get(const Map *map, int row, int col);

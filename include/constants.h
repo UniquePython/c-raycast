@@ -1,13 +1,11 @@
-#ifndef MACROS_H
-#define MACROS_H
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
 static const int WIN_WIDTH = 900;
 static const int WIN_HEIGHT = 600;
 
-static const uint32_t COLOR_WHITE = 0xEEEEEEFF;
-
-static const int NROWS = 5;
-static const int NCOLS = 5;
+static const int NROWS = 7;
+static const int NCOLS = 7;
 
 static const int CELL_SIZE = 50;
 

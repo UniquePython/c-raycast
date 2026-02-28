@@ -26,6 +26,8 @@ Player Init_Player(const Map *);
 
 float Cast_Ray(const Map *, float, float, float);
 
+void Render(SDL_Surface *, const Map *, const Player *, Uint32, Uint32);
+
 // --- ENTRY POINT ------------>
 
 int main(void)
@@ -41,11 +43,10 @@ int main(void)
 	Map *map_ptr = Map_CreateRandom(NROWS, NCOLS);
 	Handle_NullPtr(map_ptr, "Could not initialize map.");
 
-	// Map_Print(map_ptr);
-
 	Player player = Init_Player(map_ptr);
-	// printf("x: %g\n", player.x);
-	// printf("y: %g\n", player.y);
+
+	Uint32 mapped_black = SDL_MapRGB(surface_ptr->format, 0x00, 0x00, 0x00);
+	Uint32 mapped_yellow = SDL_MapRGB(surface_ptr->format, 0xFF, 0xFF, 0x00);
 
 	// <!------------ EVENT LOOP ------------!>
 	bool running = true;
@@ -53,9 +54,9 @@ int main(void)
 	{
 		Handle_Input(&running);
 
-		SDL_Rect rect = {WIN_WIDTH / 2, WIN_HEIGHT / 2, 100, 100};
-		SDL_FillRect(surface_ptr, &rect, COLOR_WHITE);
+		Render(surface_ptr, map_ptr, &player, mapped_black, mapped_yellow);
 		SDL_UpdateWindowSurface(window_ptr);
+
 		SDL_Delay(10); // 100 FPS
 	}
 
@@ -97,8 +98,8 @@ Player Init_Player(const Map *map)
 
 		if (Map_Get(map, r, c) == TILE_EMPTY)
 		{
-			p.x = c;
-			p.y = r;
+			p.x = c + 0.5f;
+			p.y = r + 0.5f;
 			p.angle = ANGLE;
 			p.hfov = HFOV;
 			return p;
@@ -144,4 +145,20 @@ float Cast_Ray(const Map *map, float px, float py, float angle)
 	}
 
 	return hitx ? side_dist_x - delta_dist_x : side_dist_y - delta_dist_y;
+}
+
+void Render(SDL_Surface *surface, const Map *map, const Player *player, Uint32 col_bg, Uint32 col_wall)
+{
+	SDL_FillRect(surface, NULL, col_bg);
+
+	for (int col = 0; col < WIN_WIDTH; col++)
+	{
+		float ray_angle = (player->angle - player->hfov) + 2 * ((float)col / WIN_WIDTH) * player->hfov;
+		float distance = Cast_Ray(map, player->x, player->y, ray_angle);
+		float corrected = distance * cosf(ray_angle - player->angle);
+		int wall_height = (int)(WIN_HEIGHT / corrected);
+
+		SDL_Rect stripe = {col, (WIN_HEIGHT - wall_height) / 2, 1, wall_height};
+		SDL_FillRect(surface, &stripe, col_wall);
+	}
 }

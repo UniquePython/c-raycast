@@ -1,7 +1,7 @@
 # Compiler and flags
 CC := gcc
 CFLAGS := -Wall -Wextra -Iinclude $(shell sdl2-config --cflags)
-LDFLAGS := $(shell sdl2-config --libs)
+LDFLAGS := $(shell sdl2-config --libs) -lm
 DEBUGFLAGS := -g
 RELEASEFLAGS := -O2
 

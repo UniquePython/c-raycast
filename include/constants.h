@@ -6,4 +6,7 @@ static const int WIN_HEIGHT = 600;
 
 static const uint32_t COLOR_WHITE = 0xEEEEEEFF;
 
+static const uint32_t NROWS = 5;
+static const uint32_t NCOLS = 5;
+
 #endif

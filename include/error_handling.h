@@ -29,4 +29,6 @@ static inline void Check_Pointer(void *p)
     Handle_SDL_Error((Error){ERROR_PTR, .value.ptr = p});
 }
 
+void Handle_NullPtr(void *, const char *);
+
 #endif

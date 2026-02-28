@@ -25,3 +25,12 @@ void Handle_SDL_Error(Error error)
         break;
     }
 }
+
+void Handle_NullPtr(void *p, const char *msg)
+{
+    if (!p)
+    {
+        fprintf(stderr, msg);
+        exit(EXIT_FAILURE);
+    }
+}

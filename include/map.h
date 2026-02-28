@@ -6,7 +6,8 @@
 typedef enum
 {
     TILE_EMPTY = 0,
-    TILE_WALL
+    TILE_WALL,
+    N_TILES
 } TileType;
 
 typedef struct
@@ -21,5 +22,7 @@ void Map_Destroy(Map *map);
 
 TileType Map_Get(const Map *map, int row, int col);
 void Map_Set(Map *map, int row, int col, TileType value);
+
+void Map_Print(const Map *map);
 
 #endif

@@ -30,7 +30,7 @@ void Handle_NullPtr(void *p, const char *msg)
 {
     if (!p)
     {
-        fprintf(stderr, msg);
+        fprintf(stderr, "%s\n", msg);
         exit(EXIT_FAILURE);
     }
 }

@@ -11,9 +11,16 @@
 
 // --- DATA TYPES ------------>
 
+typedef struct
+{
+	float x, y, hfov, angle;
+} Player;
+
 // --- PROTOTYPES ------------>
 
 void Handle_Input(bool *);
+
+Player Init_Player(const Map *);
 
 // --- ENTRY POINT ------------>
 
@@ -29,6 +36,12 @@ int main(void)
 
 	Map *map_ptr = Map_CreateRandom(NROWS, NCOLS);
 	Handle_NullPtr(map_ptr, "Could not initialize map.");
+
+	// Map_Print(map_ptr);
+
+	Player player = Init_Player(map_ptr);
+	// printf("x: %g\n", player.x);
+	// printf("y: %g\n", player.y);
 
 	// <!------------ EVENT LOOP ------------!>
 	bool running = true;
@@ -61,4 +74,32 @@ void Handle_Input(bool *running)
 			break;
 		}
 	}
+}
+
+Player Init_Player(const Map *map)
+{
+	Player p = {0};
+
+	if (!map || !map->data)
+		return p;
+
+	int r, c;
+	int max_attempts = map->rows * map->cols;
+
+	while (max_attempts--)
+	{
+		r = rand() % map->rows;
+		c = rand() % map->cols;
+
+		if (Map_Get(map, r, c) == TILE_EMPTY)
+		{
+			p.x = c;
+			p.y = r;
+			p.angle = ANGLE;
+			p.hfov = HFOV;
+			return p;
+		}
+	}
+
+	return p;
 }

@@ -1,6 +1,7 @@
 # Compiler and flags
 CC := gcc
-CFLAGS := -Wall -Wextra -Iinclude
+CFLAGS := -Wall -Wextra -Iinclude $(shell sdl2-config --cflags)
+LDFLAGS := $(shell sdl2-config --libs)
 DEBUGFLAGS := -g
 RELEASEFLAGS := -O2
 
@@ -39,7 +40,7 @@ debug: dirs $(BIN_DIR)/$(TARGET)
 # Build executable
 # -----------------------------
 $(BIN_DIR)/$(TARGET): $(OBJS)
-	$(CC) $(OBJS) -o $@
+	$(CC) $(OBJS) $(LDFLAGS) -o $@
 
 # -----------------------------
 # Build object files with dependency tracking
